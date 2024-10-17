@@ -7,47 +7,43 @@ import { useState } from 'react';
 import { AddIcon } from '@chakra-ui/icons';
 import ChatLoading from './ChatLoading.js';
 import { getSender } from '../../Config/ChatLogic.js';
+import GroupChat from './GroupChat.js';
 
-const MyChats = () => {
-    const [loggedUser, setLoggedUser] = useState();
-    const { user,selectedChat, setSelectedChat, chats, setChats } = ChatState();
+const MyChats = (fetchChat) => {
+  const [loggedUser, setLoggedUser] = useState();
+  const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
 
-    const toast = useToast();
+  const toast = useToast();
 
-    const fetchChats = async () => {
+  const fetchChats = async () => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.data.token}`,
+        },
+      };
 
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user.data.token}`,
-          },
-        };
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_HOST}/api/chat`,
+        config
+      );
+      setChats(data);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to Load the chats",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+  };
 
-        const { data } = await axios.get(
-          `${process.env.REACT_APP_HOST}/api/chat`,
-          config
-          );
-          console.log(data)
-        setChats(data);
-      } catch (error) {
-        toast({
-          title: "Error Occured!",
-          description: "Failed to Load the chats",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "bottom-left",
-        });
-      }
-    };
-
-
-    useEffect(() => {
-        setLoggedUser(JSON.parse(localStorage.getItem("userInfo")))
-        fetchChats()
-    }, []);
-
-
+  useEffect(() => {
+    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
+    fetchChats();
+  }, [fetchChats]);
 
   return (
     <>
@@ -57,7 +53,6 @@ const MyChats = () => {
         alignItems="center"
         p={3}
         bg="white"
-        
         w={{ base: "100%", md: "31%" }}
         borderRadius="lg"
         borderWidth="1px"
@@ -73,13 +68,15 @@ const MyChats = () => {
           alignItems="center"
         >
           <span>My Chats</span>
-          <Button
-            display="flex"
-            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-            rightIcon={<AddIcon />}
-          >
-            New Group Chat
-          </Button>
+          <GroupChat>
+            <Button
+              display="flex"
+              fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+              rightIcon={<AddIcon />}
+            >
+              New Group Chat
+            </Button>
+          </GroupChat>
         </Box>
         <Box
           d="flex"
@@ -106,7 +103,7 @@ const MyChats = () => {
                 >
                   <Text>
                     {!chat.isGroupChat
-                      ? getSender(loggedUser, chat.users)
+                      ? getSender(loggedUser.data, chat.users)
                       : chat.chatName}
                   </Text>
                   {chat.latestMessage && (
@@ -127,6 +124,6 @@ const MyChats = () => {
       </Box>
     </>
   );
-}
+};
 
 export default MyChats
