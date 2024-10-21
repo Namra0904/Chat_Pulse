@@ -9,16 +9,21 @@ import { useState } from 'react'
 const Chat = () => {
 
   const { user } = ChatState()
-  const [fetchChats,setFetchAgain] = useState(false)
+  const [fetchChats, setFetchAgain] = useState(false)
+  
   return (
     <div style={{ width: "100%" }}>
       {user && <SideDrawer />}
-      <Box d="flex" justifyContent="space-between" w="100%" h="91.5vh" p="10">
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        w="100%"
+        h="91.5vh"
+        p="4"
+      >
+        {user && <MyChats fetchChat={fetchChats} />}
         {user && (
-          <MyChats fetchChat={fetchChats} />
-        )}
-        {user && (
-          <ChatBox fetchChats={fetchChats} setFetchAgain={setFetchAgain} />
+          <ChatBox fetchAgain={fetchChats} setFetchAgain={setFetchAgain} />
         )}
       </Box>
     </div>

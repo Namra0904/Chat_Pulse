@@ -9,6 +9,7 @@ import axios from 'axios';
 import ChatLoading from './ChatLoading.js';
 import { Spinner } from "@chakra-ui/react";
 import UserListItem from './UserListItem.js';
+import logo from "../../Assests/chat-pulse-high-resolution-logo-transparent.png";
 
 import {
   Drawer,
@@ -28,7 +29,9 @@ const SideDrawer = () => {
      const toast = useToast();
      const { isOpen, onOpen, onClose } = useDisclosure();
     const history = useHistory()
-    const { user , setSelectedChat,chats,setChats} = ChatState();
+  const { user, setSelectedChat, chats, setChats } = ChatState();
+  
+  
       const logoutHandler = () => {
         localStorage.removeItem("userInfo");
         history.push("/");
@@ -125,9 +128,10 @@ const SideDrawer = () => {
             </Button>
           </Tooltip>
 
-          <Text fontSize="2xl" fontFamily="Work sans">
+          {/* <Text fontSize="2xl" fontFamily="Work sans">
             Chat-Pulse
-          </Text>
+          </Text> */}
+          <img src={logo} height="150px" width="150px" />
           <div>
             <Menu>
               <MenuButton p={1}>
@@ -155,6 +159,8 @@ const SideDrawer = () => {
             </Menu>
           </div>
         </Box>
+
+        
         <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
           <DrawerOverlay />
           <DrawerContent>

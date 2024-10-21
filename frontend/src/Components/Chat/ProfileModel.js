@@ -23,9 +23,19 @@ const ProfileModel = ({ user, children }) => {
       {children ? (
         <span onClick={onOpen}>{children}</span>
       ) : (
-        <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
+        <IconButton
+          display={{ base: "flex" }}
+          icon={<ViewIcon />}
+          onClick={onOpen}
+        />
       )}
-      <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered>
+      <Modal
+        size="lg"
+        onClose={onClose}
+        isOpen={isOpen}
+        isCentered
+        motionPreset="none"
+      >
         <ModalOverlay />
         <ModalContent h="410px">
           <ModalHeader
@@ -34,11 +44,11 @@ const ProfileModel = ({ user, children }) => {
             display="flex" // Corrected
             justifyContent="center"
           >
-            {user?.data?.name}
+            {user?.data ? <>{user?.data?.name}</> : <>{user?.name}</>}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody
-            display="flex" // Corrected
+            display="flex"
             flexDirection="column"
             alignItems="center"
             justifyContent="space-between"
@@ -46,14 +56,14 @@ const ProfileModel = ({ user, children }) => {
             <Image
               borderRadius="full"
               boxSize="150px"
-              src={user?.data?.pic}
+              src={user.data ? (<>{user.data.pic}</>) : (<>{ user.pic}</>)}
               alt={user?.name}
             />
             <Text
               fontSize={{ base: "28px", md: "30px" }}
               fontFamily="Work sans"
             >
-              Email: {user?.data?.email}
+              Email: {user?.data ? (<>{user.data.email}</>) : (<>{ user.email}</>)}
             </Text>
           </ModalBody>
           <ModalFooter>

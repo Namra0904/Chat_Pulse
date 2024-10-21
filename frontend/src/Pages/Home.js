@@ -14,6 +14,7 @@ import Login from "../Components/Authentication/Login";
 import SignUp from "../Components/Authentication/SignUp";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
+import logo from "../Assests/logo-no-background.png"
 
 const Home = () => {
 // const history = useHistory()
@@ -45,7 +46,7 @@ const Home = () => {
             fontWeight="700"
             marginBottom="18"
           >
-            Chat-Pulse
+            <img src={logo} height="180px" width="180px"/>
           </Text>
           <Tabs variant="soft-rounded">
             <TabList mb="1em">

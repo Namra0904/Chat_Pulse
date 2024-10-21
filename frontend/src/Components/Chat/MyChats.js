@@ -43,12 +43,12 @@ const MyChats = (fetchChat) => {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
-  }, [fetchChats]);
+  }, []);
 
   return (
     <>
       <Box
-        d={{ base: selectedChat ? "none" : "flex", md: "flex" }}
+        display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
         flexDir="column"
         alignItems="center"
         p={3}
@@ -62,17 +62,18 @@ const MyChats = (fetchChat) => {
           px={3}
           fontSize={{ base: "28px", md: "30px" }}
           fontFamily="Work sans"
-          display="flex" // Changed 'd' to 'display'
+          display="flex"
           w="100%"
           justifyContent="space-between"
           alignItems="center"
         >
-          <span>My Chats</span>
+          <span style={{ fontWeight: "700" }}>My Chats</span>
           <GroupChat>
             <Button
               display="flex"
-              fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+              // fontSize={{ base: "17px", md: "10px", lg: "17px" }}
               rightIcon={<AddIcon />}
+              size="sm"
             >
               New Group Chat
             </Button>
