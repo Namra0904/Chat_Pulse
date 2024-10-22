@@ -10,6 +10,11 @@ import axios from 'axios';
 import ScrollableChat from './ScrollableChat.js';
 import "./style.css"
 import { isSameSender } from '../../Config/ChatLogic.js';
+import io from 'socket.io-client'
+
+
+const ENDPOINT = "http://localhost:5000";
+var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
@@ -17,10 +22,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [message, setMessage] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState();
+  const [socketConnected, setSocketConnected] = useState(false)
+  const [typing, setTyping] = useState(false)
+  const [istyping,setIsTyping] = useState(false)
   const toast = useToast()
 
+    useEffect(() => {
+      socket = io(ENDPOINT);
+      socket.emit("setup", user.data);
+      socket.on("connected", () => {
+        setSocketConnected(true);
+      });
+      socket.on('typing', () => setTyping(true))
+      socket.on('stop typing',()=>setIsTyping(false))
+    },[]);
+  
   const fetchMessages = async () => {
     if (!selectedChat) return;
+  
 
     try {
       const config = {
@@ -37,7 +56,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       );
       setMessage(data);
       setLoading(false);
-
+      socket.emit('join chat',selectedChat._id)
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -52,11 +71,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
     useEffect(() => {
       fetchMessages();
+      selectedChatCompare = selectedChat
     }, [selectedChat]);
+  
+  
+  useEffect(() => {
+    socket.on('message recieved', (newMessageRecieved) => {
+      if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
+        // give notification
+      } else {
+         setMessage([...message, newMessageRecieved]);
+      }
+    })
+  })
   
  
   const sendMessage = async(e) => {
     if (e.key === "Enter" && newMessage) {
+      socket.emit('stop typing',selectedChat._id)
       try {
           const config = {
             headers: {
@@ -74,7 +106,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         );
         console.log(data)
         setNewMessage("");
-        setMessage([...message,data])
+        setMessage([...message, data])
+        socket.emit("new message",data);
       } catch (error) {
          toast({
            title: "Error Occured!",
@@ -88,10 +121,27 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   }
 
-  const typingHandler = (e) => {
-    setNewMessage(e.target.value)
 
-  }
+ const typingHandler = (e) => {
+   setNewMessage(e.target.value);
+
+   if (!socketConnected)
+     return console.log("error")
+   if (!typing) {
+     setTyping(true);
+     socket.emit("typing", selectedChat._id);
+   }
+   let lastTypingTime = new Date().getTime();
+   var timerLength = 3000;
+   setTimeout(() => {
+     var timeNow = new Date().getTime();
+     var timeDiff = timeNow - lastTypingTime;
+     if (timeDiff >= timerLength && typing) {
+       socket.emit("stop typing", selectedChat._id);
+       setTyping(false);
+     }
+   }, timerLength);
+ };
 
   return (
     <>
@@ -124,7 +174,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 <>
                   {selectedChat.chatName.toUpperCase()}
                   <UpdateGroupChatModal
-                     fetchMessages={fetchMessages}
+                    fetchMessages={fetchMessages}
                     fetchAgain={fetchAgain}
                     setFetchAgain={setFetchAgain}
                   />
@@ -151,8 +201,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                   margin="auto"
                 />
               ) : (
-                  <div className="messages">
-                    <ScrollableChat message={message}/>
+                <div className="messages">
+                  <ScrollableChat message={message} />
                 </div>
               )}
               <FormControl
@@ -161,18 +211,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 isRequired
                 mt={3}
               >
-                {/* {istyping ? (
-                  <div>
-                    <Lottie
-                      options={defaultOptions}
-                      // height={50}
-                      width={70}
-                      style={{ marginBottom: 15, marginLeft: 0 }}
-                    />
-                  </div>
-                ) : (
-                  <></>
-                )} */}
+                {istyping ? <div>Someone is typing...</div> : null}
                 <Input
                   variant="filled"
                   bg="#E0E0E0"

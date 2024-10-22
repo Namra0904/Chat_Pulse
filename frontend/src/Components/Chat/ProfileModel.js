@@ -11,6 +11,7 @@ import {
   IconButton,
   Text,
   Image,
+  Avatar
 } from "@chakra-ui/react";
 import { ViewIcon } from "@chakra-ui/icons";
 import React from "react";
@@ -53,17 +54,28 @@ const ProfileModel = ({ user, children }) => {
             alignItems="center"
             justifyContent="space-between"
           >
-            <Image
+            {/* <Image
               borderRadius="full"
               boxSize="150px"
               src={user.data ? (<>{user.data.pic}</>) : (<>{ user.pic}</>)}
               alt={user?.name}
+            /> */}
+            <Avatar
+              size="2xl"
+              cursor="pointer"
+              name={
+                user?.data?.name
+                  ? user.data.name.slice(0, 2).toUpperCase()
+                  : "NA"
+              }
+              // src={user?.data?.pic}
             />
+
             <Text
               fontSize={{ base: "28px", md: "30px" }}
               fontFamily="Work sans"
             >
-              Email: {user?.data ? (<>{user.data.email}</>) : (<>{ user.email}</>)}
+              Email: {user?.data ? <>{user.data.email}</> : <>{user.email}</>}
             </Text>
           </ModalBody>
           <ModalFooter>
