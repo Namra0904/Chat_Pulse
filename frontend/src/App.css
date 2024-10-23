@@ -16,3 +16,59 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+
+/* NotificationButton.css */
+.notification-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.notification-button {
+ 
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+
+.notification-button:active {
+  /* background-color: #374151; */
+  box-shadow: none;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.95rem;
+  width: 16px;
+  height: 16px;
+  background-color: #dc2626; /* Red color */
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Centering the number vertically */
+}
+
+.notification-badge div {
+  line-height: 1; /* Ensure the text is not misaligned due to line-height */
+}
+
+
+.slide-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-out {
+  transform: translateY(16px);
+  opacity: 0;
+}

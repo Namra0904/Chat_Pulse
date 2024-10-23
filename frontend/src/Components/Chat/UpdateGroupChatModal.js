@@ -19,7 +19,8 @@ import UserListItem from './UserListItem.js';
 
 
 const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
-  const { user, selectedChat, setSelectedChat } = ChatState();
+  const { user, selectedChat, setSelectedChat, setChats } = ChatState();
+
   const [groupChatName, setGroupChatName] = useState("");
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -28,12 +29,12 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  console.log(user);
+
 
   const handleRemove = async (user1) => {
     if (
       selectedChat.groupAdmin._id !== user.data._id &&
-      user1._id !== user.data._id
+      user1.data._id !== user.data._id
     ) {
       toast({
         title: "Only admins can remove someone!",
@@ -52,19 +53,21 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
           Authorization: `Bearer ${user.data.token}`,
         },
       };
+      console.log("user1",user1)
       const { data } = await axios.put(
         `${process.env.REACT_APP_HOST}/api/chat/removeFromGroup`,
         {
           chatId: selectedChat._id,
-          userId: user1._id,
+          userId: user1.data._id,
         },
         config
       );
 
-      user1._id === user.data._id ? setSelectedChat() : setSelectedChat(data);
+      user1.data._id === user.data._id ? setSelectedChat() : setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       fetchMessages();
       setLoading(false);
+      setChats((chats)=>chats.filter((c)=>c._id !== selectedChat._id))
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -80,7 +83,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   };
 
   const handleAddUser = async (user1) => {
-    if (selectedChat.users.find((u) => u._id === user1._id)) {
+    if (selectedChat.users.find((u) => u._id === user1.data._id)) {
       toast({
         title: "User Already in group!",
         status: "error",
@@ -113,7 +116,7 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
         `${process.env.REACT_APP_HOST}/api/chat/groupadd`,
         {
           chatId: selectedChat._id,
-          userId: user1._id,
+          userId: user1.data._id,
         },
         config
       );

@@ -10,6 +10,8 @@ import ChatLoading from './ChatLoading.js';
 import { Spinner } from "@chakra-ui/react";
 import UserListItem from './UserListItem.js';
 import logo from "../../Assests/chat-pulse-high-resolution-logo-transparent.png";
+import { useEffect } from 'react';
+import "../../App.css"
 
 import {
   Drawer,
@@ -18,6 +20,7 @@ import {
   DrawerHeader,
   DrawerOverlay,
 } from "@chakra-ui/react";
+import { getSender } from '../../Config/ChatLogic.js';
 
 const SideDrawer = () => {
 
@@ -29,7 +32,21 @@ const SideDrawer = () => {
      const toast = useToast();
      const { isOpen, onOpen, onClose } = useDisclosure();
     const history = useHistory()
-  const { user, setSelectedChat, chats, setChats } = ChatState();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
+
+    const [slideUp, setSlideUp] = useState(false);
+    useEffect(() => {
+      setSlideUp(true); 
+    }, [notification]);
+   
+   
   
   
       const logoutHandler = () => {
@@ -105,7 +122,8 @@ const SideDrawer = () => {
         });
         setLoadingChat(false); 
       }
-    };
+  };
+
     
     return (
       <>
@@ -128,16 +146,42 @@ const SideDrawer = () => {
             </Button>
           </Tooltip>
 
-          {/* <Text fontSize="2xl" fontFamily="Work sans">
-            Chat-Pulse
-          </Text> */}
           <img src={logo} height="150px" width="150px" />
           <div>
             <Menu>
               <MenuButton p={1}>
-                <BellIcon fontSize="2xl" m={1} />
+                <div className="notification-container">
+                  <button className="notification-button" type="button">
+                    <BellIcon fontSize="2xl" m={1} />
+                  </button>
+                  <div
+                    className={`notification-badge ${
+                      slideUp ? "slide-in" : "slide-out"
+                    }`}
+                  >
+                    <div>{notification.length}</div>
+                  </div>
+                </div>
               </MenuButton>
-              {/* <MenuList></MenuList> */}
+              <MenuList pl={2}>
+                {!notification.length && "No new Message"}
+                {notification.map((notif) => (
+                  <MenuItem
+                    key={notif._id}
+                    onClick={() => {
+                      setSelectedChat(notif.chat);
+                      setNotification(notification.filter((n) => n !== notif));
+                    }}
+                  >
+                    {notif.chat.isGroupChat
+                      ? `New Message ${notif.chat.chatName}`
+                      : `New Message from ${getSender(
+                          user.data,
+                          notif.chat.users
+                        )}`}
+                  </MenuItem>
+                ))}
+              </MenuList>
             </Menu>
             <Menu>
               <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
@@ -160,7 +204,6 @@ const SideDrawer = () => {
           </div>
         </Box>
 
-        
         <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
           <DrawerOverlay />
           <DrawerContent>

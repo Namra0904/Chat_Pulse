@@ -13,12 +13,13 @@ import { isSameSender } from '../../Config/ChatLogic.js';
 import io from 'socket.io-client'
 
 
+
 const ENDPOINT = "http://localhost:5000";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
-  const { user, selectedChat, setSelectedChat } = ChatState()
+  const { user, selectedChat, setSelectedChat,notification,setNotification } = ChatState()
   const [message, setMessage] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState();
@@ -26,6 +27,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false)
   const [istyping,setIsTyping] = useState(false)
   const toast = useToast()
+
+ 
 
     useEffect(() => {
       socket = io(ENDPOINT);
@@ -74,16 +77,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       selectedChatCompare = selectedChat
     }, [selectedChat]);
   
+  console.log(notification, "----------");
   
-  useEffect(() => {
-    socket.on('message recieved', (newMessageRecieved) => {
-      if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
-        // give notification
-      } else {
-         setMessage([...message, newMessageRecieved]);
-      }
-    })
-  })
+ useEffect(() => {
+   socket.on("message recieved", (newMessageRecieved) => {
+     if (
+       !selectedChatCompare ||
+       selectedChatCompare._id !== newMessageRecieved.chat._id
+     ) {
+       if (!notification.includes(newMessageRecieved)) {
+         setNotification([newMessageRecieved, ...notification]);
+         setFetchAgain(!fetchAgain);
+       }
+     } else {
+       setMessage([...message, newMessageRecieved]);
+     }
+   });
+ });
+
   
  
   const sendMessage = async(e) => {

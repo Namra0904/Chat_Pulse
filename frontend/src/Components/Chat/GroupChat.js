@@ -14,7 +14,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
 import UserListItem from './UserListItem.js'
 import UserBadgeItem from "./UserBadgeItem.js";
@@ -29,6 +29,7 @@ const GroupChat = ({ children }) => {
   const toast = useToast();
 
   const { user, chats, setChats } = ChatState();
+  
 
   const handleGroup = (userToAdd) => {
     if (selectedUsers.includes(userToAdd)) {

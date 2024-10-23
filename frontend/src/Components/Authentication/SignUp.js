@@ -195,11 +195,11 @@ const SignUp = () => {
               </InputRightElement>
             </InputGroup>
           </FormControl>
-          <FormControl id="pic">
+          {/* <FormControl id="pic">
             <FormLabel>Upload Your Pic</FormLabel>
             <Input type="File" p={1.5} accept='image/*'
               onChange={(e) => { postDetails(e.target.files[0]) }} />
-          </FormControl>
+          </FormControl> */}
           <Button colorScheme='blue' width="100%" style={{ marginTop: "15" }} onClick={SubmitHandler} isLoading={loading}>Sign Up</Button>
         </VStack>
       </>
