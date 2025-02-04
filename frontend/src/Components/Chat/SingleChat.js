@@ -12,8 +12,6 @@ import "./style.css"
 import { isSameSender } from '../../Config/ChatLogic.js';
 import io from 'socket.io-client'
 
-
-
 const ENDPOINT = "http://localhost:5000";
 var socket, selectedChatCompare;
 
@@ -27,8 +25,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false)
   const [istyping,setIsTyping] = useState(false)
   const toast = useToast()
-
- 
+  const [onlineUsers,setOnlineUsers] = useState([])
 
     useEffect(() => {
       socket = io(ENDPOINT);
@@ -38,12 +35,42 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       });
       socket.on('typing', () => setTyping(true))
       socket.on('stop typing',()=>setIsTyping(false))
+      socket.emit("online-user",user.data._id)
+      socket.on("get-users",(users)=>{
+        setOnlineUsers(users)
+      })
+
     },[]);
+
+    // useEffect(() => {
+    //   // Tab has focus
+    //   const handleFocus = async () => {
+    //     socket.emit("online-user", user.data._id);
+    //     socket.on("get-users", (users) => {
+    //       setOnlineUsers(users);
+    //     });
+    //   };
+  
+    //   // Tab closed
+    //   const handleBlur = () => {
+    //     if(user) {
+    //       socket.emit("offline")   
+    //     }
+    //   };
+  
+    //   // Track if the user changes the tab to determine when they are online
+    //   window.addEventListener('focus', handleFocus);
+    //   window.addEventListener('blur', handleBlur);
+  
+    //   return () => {
+    //     window.removeEventListener('focus', handleFocus);
+    //     window.removeEventListener('blur', handleBlur);
+    //   };   
+    // }, [user]);
   
   const fetchMessages = async () => {
     if (!selectedChat) return;
   
-
     try {
       const config = {
         headers: {
